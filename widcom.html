@@ -1,0 +1,61 @@
+<div id="se-container" style="max-width: 600px; margin: 20px auto; font-family: -apple-system, sans-serif; color: #333; padding: 15px;">
+    <h3 style="border-bottom: 2px solid #eee; padding-bottom: 10px;">Yorumlar (<span id="se-count">0</span>)</h3>
+    
+    <div id="se-list" style="margin-top: 20px;"></div>
+
+    <div style="margin-top: 30px; background: #fdfdfd; border: 1px solid #eee; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+        <input type="text" id="se-u" placeholder="Adınız" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;">
+        <textarea id="se-t" placeholder="Yorumunuz onaylandıktan sonra görünecektir..." style="width: 100%; height: 80px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; resize: none; box-sizing: border-box;"></textarea>
+        <button id="se-btn" onclick="seSend()" style="width: 100%; margin-top: 10px; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Gönder</button>
+    </div>
+</div>
+
+<style>
+    .se-item { margin-bottom: 20px; padding: 15px; border-radius: 10px; background: #fff; border: 1px solid #f0f0f0; }
+    .se-name { font-weight: 700; color: #111; font-size: 14px; }
+    .se-txt { margin-top: 5px; font-size: 15px; line-height: 1.5; }
+    .se-admin-reply { margin-top: 12px; padding: 10px; background: #f0f7ff; border-left: 3px solid #2563eb; border-radius: 4px; font-size: 14px; }
+    .se-admin-tag { font-weight: 700; color: #2563eb; font-size: 12px; text-transform: uppercase; margin-bottom: 4px; display: block; }
+</style>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, push, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    const config = {
+        apiKey: "AIzaSyAGw79xzO43dw5Vts7f2iV6vmA_BLxBJ1A",
+        authDomain: "secoment.firebaseapp.com",
+        databaseURL: "https://secoment-default-rtdb.firebaseio.com",
+        projectId: "secoment"
+    };
+
+    const app = initializeApp(config);
+    const db = getDatabase(app);
+    const pageId = window.location.pathname.replace(/[^a-zA-Z0-9]/g, '_') || "home";
+    const dbRef = ref(db, 'comments/' + pageId);
+
+    onValue(dbRef, (snap) => {
+        const list = document.getElementById("se-list");
+        let html = ""; let count = 0;
+        
+        snap.forEach((child) => {
+            const v = child.val();
+            if (v.approved) {
+                count++;
+                let replyHtml = v.reply ? `<div class="se-admin-reply"><span class="se-admin-tag">Yönetici Yanıtı</span>${v.reply}</div>` : "";
+                html = `<div class="se-item"><div class="se-name">${v.u}</div><div class="se-txt">${v.t}</div>${replyHtml}</div>` + html;
+            }
+        });
+        list.innerHTML = html || "<p style='color:#999; text-align:center;'>İlk yorumu siz yapın!</p>";
+        document.getElementById("se-count").innerText = count;
+    });
+
+    window.seSend = async () => {
+        const u = document.getElementById("se-u").value; const t = document.getElementById("se-t").value;
+        if(!u || !t) return alert("Boş bırakmayın!");
+        await push(dbRef, { u, t, approved: false, time: serverTimestamp() });
+        alert("Yorumunuz alındı, onay bekliyor.");
+        document.getElementById("se-t").value = "";
+    };
+</
+  script>
