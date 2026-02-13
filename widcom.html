@@ -5,17 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Web sitesi rengine uyum sağlaması için tamamen şeffaf */
-        body, html { 
-            background: transparent !important; 
+        /* Tam şeffaflık ve sıfır arka plan */
+        html, body { 
+            background: none !important; 
+            background-color: transparent !important; 
             color: inherit; 
-            margin: 0; 
-            padding: 0;
         }
         
-        /* Kutucuklar: Görseldeki koyu arka planı koruyoruz */
+        /* Kutucuklar: Görseldeki koyu doku */
         .input-box {
-            background-color: #2d3748; /* Görseldeki koyu gri/mavi ton */
+            background-color: #2d3748;
             border: 1px solid #4a5568;
             border-radius: 4px;
             color: #ffffff;
@@ -23,34 +22,27 @@
             width: 100%;
             outline: none;
         }
-        .input-box:focus { border-color: #3b82f6; }
 
-        /* Buton: Sade ve durum bildirimi yapan yapı */
         .btn-submit {
             background-color: #374151;
             color: white;
             padding: 10px 24px;
             border-radius: 4px;
-            font-weight: 600;
-            transition: all 0.2s;
+            font-weight: 700;
             cursor: pointer;
         }
-        .btn-submit:hover:not(:disabled) { opacity: 0.8; }
-        .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        /* Sayfalama */
-        .nav-link {
-            font-size: 12px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-            opacity: 0.6;
+        /* Admin Yanıt Çizgisi */
+        .admin-reply {
+            border-left: 2px solid #3b82f6;
+            margin-top: 12px;
+            padding-left: 12px;
+            font-style: italic;
         }
-        .nav-link:hover:not(:disabled) { opacity: 1; }
     </style>
 </head>
-<body class="p-4">
+<body>
 
     <div class="max-w-2xl mx-auto space-y-5">
         
@@ -60,18 +52,17 @@
                 <input type="email" class="input-box text-sm" placeholder="Email (isteğe bağlı)">
             </div>
             <textarea id="se-t" rows="4" class="input-box text-sm" placeholder="Yorumunuz..."></textarea>
-            <button id="se-btn" class="btn-submit text-sm uppercase tracking-wide">Yorum Gönder</button>
+            <button id="se-btn" class="btn-submit text-sm uppercase">Yorum Gönder</button>
         </div>
 
-        <div class="border-t border-gray-700/50 my-6"></div>
+        <div class="border-t border-gray-700/30 my-6"></div>
 
-        <div id="se-list" class="space-y-6">
-            </div>
+        <div id="se-list" class="space-y-8"></div>
 
         <div id="pagination" class="flex items-center justify-between pt-6 hidden">
-            <button id="prevBtn" class="nav-link">← Geri</button>
-            <span id="pageInfo" class="text-[10px] opacity-40 font-bold tracking-widest">SAYFA 1</span>
-            <button id="nextBtn" class="nav-link">İleri →</button>
+            <button id="prevBtn" class="text-xs font-bold opacity-50 hover:opacity-100">← GERİ</button>
+            <span id="pageInfo" class="text-[10px] opacity-40 font-bold">SAYFA 1</span>
+            <button id="nextBtn" class="text-xs font-bold opacity-50 hover:opacity-100">İLERİ →</button>
         </div>
     </div>
 
@@ -114,14 +105,20 @@
             const items = allData.slice(start, start + perPage);
 
             list.innerHTML = items.map(v => `
-                <div class="border-b border-gray-800/30 pb-4">
-                    <div class="flex justify-between items-baseline mb-2">
-                        <span class="font-bold text-sm">${v.u}</span>
-                        <span class="text-[10px] opacity-30 italic">${new Date(v.time).toLocaleDateString()}</span>
+                <div class="pb-4 border-b border-gray-800/20">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-bold text-sm uppercase">${v.u}</span>
+                        <span class="text-[9px] opacity-40">${new Date(v.time).toLocaleString()}</span>
                     </div>
-                    <p class="text-[14px] leading-relaxed opacity-80">${v.t}</p>
+                    <p class="text-sm opacity-80">${v.t}</p>
+                    ${v.reply ? `
+                        <div class="admin-reply">
+                            <span class="text-[10px] font-bold text-blue-500 uppercase block mb-1">Admin Yanıtı</span>
+                            <p class="text-xs opacity-70">${v.reply}</p>
+                        </div>
+                    ` : ''}
                 </div>
-            `).join('') || '<p class="text-xs opacity-30 italic">Sohbeti başlatan ilk kişi olun...</p>';
+            `).join('') || '<p class="text-xs opacity-30 italic">Yorum yükleniyor veya henüz yok...</p>';
 
             const pag = document.getElementById("pagination");
             if (allData.length > perPage) {
@@ -132,31 +129,22 @@
             }
         }
 
-        document.getElementById("nextBtn").onclick = () => { currentPage++; draw(); };
-        document.getElementById("prevBtn").onclick = () => { currentPage--; draw(); };
+        document.getElementById("nextBtn").onclick = () => { currentPage++; draw(); window.scrollTo(0,0); };
+        document.getElementById("prevBtn").onclick = () => { currentPage--; draw(); window.scrollTo(0,0); };
 
         document.getElementById("se-btn").onclick = async () => {
-            const u = document.getElementById("se-u").value.trim();
             const t = document.getElementById("se-t").value.trim();
+            const u = document.getElementById("se-u").value.trim() || 'Anonim';
             const btn = document.getElementById("se-btn");
 
             if (!t) return;
-
-            // Buton Durumu Değiştirme
             btn.disabled = true;
             btn.innerText = "GÖNDERİLİYOR...";
 
             try {
-                await push(dbRef, { 
-                    u: u || 'Anonim', 
-                    t, 
-                    approved: false, 
-                    time: serverTimestamp() 
-                });
-                alert("Mesajınız iletildi, onay sonrası yayınlanacaktır.");
+                await push(dbRef, { u, t, approved: false, time: serverTimestamp() });
+                alert("İletildi, onay bekleniyor.");
                 document.getElementById("se-t").value = "";
-            } catch (err) {
-                alert("Hata oluştu.");
             } finally {
                 btn.disabled = false;
                 btn.innerText = "YORUM GÖNDER";
