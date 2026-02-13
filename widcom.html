@@ -1,169 +1,246 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* CSS İLE ŞEFFAFLIK ZORLAMASI */
-        :root { background: transparent !important; }
-        html, body { 
-            background: transparent !important; 
-            background-color: transparent !important;
-            color: inherit; /* Sitenin yazı rengini alır */
-            margin: 0; padding: 0;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
 
-        /* Kutucuklar - Görseldeki Koyu Gri Tonu */
-        .input-box {
-            background-color: #2d3748 !important;
-            border: 1px solid #4a5568;
-            border-radius: 4px;
-            color: #ffffff;
-            padding: 12px;
-            width: 100%;
-            outline: none;
-        }
+<style>
+html, body {
+  background: transparent !important;
+  margin: 0;
+  padding: 0;
+}
 
-        /* Buton Stili */
-        .btn-submit {
-            background-color: #3f4a5e;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 4px;
-            font-weight: 700;
-            text-transform: uppercase;
-            cursor: pointer;
-        }
-        .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+.input-box {
+  background-color: #2d3748;
+  border: 1px solid #4a5568;
+  border-radius: 6px;
+  color: #fff;
+  padding: 12px;
+  width: 100%;
+  outline: none;
+}
 
-        /* Admin Yanıtı - Görseldeki Stil */
-        .admin-reply-container {
-            border-left: 3px solid #3b82f6;
-            margin-top: 10px;
-            padding-left: 12px;
-        }
-        .admin-title {
-            color: #3b82f6;
-            font-size: 11px;
-            font-weight: 900;
-            text-transform: uppercase;
-            font-style: italic;
-            display: block;
-            margin-bottom: 2px;
-        }
-        .admin-msg {
-            font-style: italic;
-            opacity: 0.8;
-            font-size: 14px;
-        }
-    </style>
+.btn-submit {
+  background-color: #3f4a5e;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: .2s;
+}
+.btn-submit:hover { opacity:.9 }
+.btn-submit:disabled { opacity:.6; cursor:not-allowed }
+
+.admin-reply-container {
+  border-left: 3px solid #3b82f6;
+  margin-top: 10px;
+  padding-left: 12px;
+}
+
+.admin-title {
+  color: #3b82f6;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  font-style: italic;
+}
+
+.admin-msg {
+  font-style: italic;
+  opacity: .8;
+}
+
+.break-words {
+  word-break: break-word;
+}
+</style>
 </head>
 <body>
 
-    <div class="max-w-2xl mx-auto space-y-5 p-2">
-        <div class="space-y-4">
-            <input type="text" id="se-u" class="input-box text-sm" placeholder="Nickname">
-            <input type="email" class="input-box text-sm" placeholder="Email (isteğe bağlı)">
-            <textarea id="se-t" rows="4" class="input-box text-sm" placeholder="Yorumunuz..."></textarea>
-            <button id="se-btn" class="btn-submit text-sm">Yorum Gönder</button>
-        </div>
+<div class="max-w-2xl mx-auto space-y-6 p-3">
 
-        <div class="border-t border-gray-700/20 my-6"></div>
-
-        <div id="se-list" class="space-y-6"></div>
-
-        <div id="pagination" class="flex items-center justify-between pt-6 hidden">
-            <button id="prevBtn" class="text-xs font-bold opacity-50 hover:opacity-100 uppercase">← Geri</button>
-            <span id="pageInfo" class="text-[10px] opacity-40 font-bold uppercase">Sayfa 1</span>
-            <button id="nextBtn" class="text-xs font-bold opacity-50 hover:opacity-100 uppercase">İleri →</button>
-        </div>
+  <div class="space-y-4">
+    <input type="text" id="se-u" class="input-box text-sm" placeholder="Nickname">
+    <textarea id="se-t" rows="4" maxlength="500" class="input-box text-sm" placeholder="Yorumunuz..."></textarea>
+    <div class="flex justify-between items-center text-xs opacity-50">
+      <span id="charCount">0 / 500</span>
     </div>
+    <button id="se-btn" class="btn-submit text-sm w-full">YORUM GÖNDER</button>
+  </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+  <div class="border-t border-gray-700/20"></div>
 
-        const config = {
-            apiKey: "AIzaSyAGw79xzO43dw5Vts7f2iV6vmA_BLxBJ1A",
-            authDomain: "secoment.firebaseapp.com",
-            databaseURL: "https://secoment-default-rtdb.firebaseio.com",
-            projectId: "secoment"
-        };
+  <div id="se-list" class="space-y-6"></div>
 
-        const app = initializeApp(config);
-        const db = getDatabase(app);
-        const params = new URLSearchParams(window.location.search);
-        const pageId = params.get('id') || "global";
-        const dbRef = ref(db, 'comments/' + pageId);
+  <div id="pagination" class="flex items-center justify-between pt-6 hidden">
+    <button id="prevBtn" class="text-xs font-bold uppercase opacity-50 hover:opacity-100">← Geri</button>
+    <span id="pageInfo" class="text-[10px] opacity-40 font-bold uppercase">Sayfa 1</span>
+    <button id="nextBtn" class="text-xs font-bold uppercase opacity-50 hover:opacity-100">İleri →</button>
+  </div>
 
-        let allData = [];
-        let currentPage = 1;
-        const perPage = 5;
+</div>
 
-        onValue(dbRef, (snap) => {
-            allData = [];
-            if (snap.exists()) {
-                const data = snap.val();
-                Object.keys(data).forEach(k => {
-                    if (data[k].approved) allData.push(data[k]);
-                });
-                allData.sort((a, b) => b.time - a.time);
-            }
-            render();
-        });
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        function render() {
-            const list = document.getElementById("se-list");
-            const start = (currentPage - 1) * perPage;
-            const items = allData.slice(start, start + perPage);
+const config = {
+  apiKey: "AIzaSyAGw79xzO43dw5Vts7f2iV6vmA_BLxBJ1A",
+  authDomain: "secoment.firebaseapp.com",
+  databaseURL: "https://secoment-default-rtdb.firebaseio.com",
+  projectId: "secoment"
+};
 
-            list.innerHTML = items.map(v => `
-                <div class="pb-4 border-b border-gray-800/10">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="font-bold text-sm uppercase">${v.u}</span>
-                        <span class="text-[9px] opacity-30">${new Date(v.time).toLocaleString()}</span>
-                    </div>
-                    <p class="text-[15px] opacity-90">${v.t}</p>
-                    ${v.reply ? `
-                        <div class="admin-reply-container">
-                            <span class="admin-title">ADMİN YANITI</span>
-                            <p class="admin-msg">${v.reply}</p>
-                        </div>
-                    ` : ''}
-                </div>
-            `).join('') || '<p class="text-xs opacity-30 italic text-center">Henüz yorum yok.</p>';
+const app = initializeApp(config);
+const db = getDatabase(app);
 
-            const pag = document.getElementById("pagination");
-            if (allData.length > perPage) {
-                pag.classList.remove("hidden");
-                document.getElementById("pageInfo").innerText = `SAYFA ${currentPage}`;
-                document.getElementById("prevBtn").disabled = currentPage === 1;
-                document.getElementById("nextBtn").disabled = start + perPage >= allData.length;
-            }
-        }
+const params = new URLSearchParams(window.location.search);
+const pageId = params.get('id') || "global";
+const dbRef = ref(db, 'comments/' + pageId);
 
-        document.getElementById("nextBtn").onclick = () => { currentPage++; render(); window.scrollTo(0,0); };
-        document.getElementById("prevBtn").onclick = () => { currentPage--; render(); window.scrollTo(0,0); };
+let allData = [];
+let currentPage = 1;
+const perPage = 5;
 
-        document.getElementById("se-btn").onclick = async () => {
-            const t = document.getElementById("se-t").value.trim();
-            const u = document.getElementById("se-u").value.trim() || 'Anonim';
-            const btn = document.getElementById("se-btn");
+/* XSS ESCAPE */
+function escapeHTML(str = "") {
+  return str.replace(/[&<>"']/g, m => ({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#039;'
+  }[m]));
+}
 
-            if (!t) return;
-            btn.disabled = true;
-            btn.innerText = "GÖNDERİLİYOR...";
+/* AUTO RESIZE */
+function resizeParent() {
+  setTimeout(() => {
+    const height = document.body.scrollHeight;
+    parent.postMessage({ type:'resize', height }, '*');
+  }, 100);
+}
 
-            try {
-                await push(dbRef, { u, t, approved: false, time: serverTimestamp() });
-                alert("Yorumunuz onay için gönderildi.");
-                document.getElementById("se-t").value = "";
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "YORUM GÖNDER";
-            }
-        };
-    </script>
+/* CHAR COUNTER */
+const textarea = document.getElementById("se-t");
+textarea.addEventListener("input", () => {
+  document.getElementById("charCount").innerText =
+    textarea.value.length + " / 500";
+});
+
+/* DATA */
+onValue(dbRef, snap => {
+  allData = [];
+
+  if (snap.exists()) {
+    const data = snap.val();
+    allData = Object.values(data)
+      .filter(v => v.approved)
+      .map(v => ({ ...v, time: v.time || 0 }))
+      .sort((a,b) => b.time - a.time);
+  }
+
+  render();
+});
+
+function render() {
+  const list = document.getElementById("se-list");
+  const start = (currentPage - 1) * perPage;
+  const items = allData.slice(start, start + perPage);
+
+  if (!items.length) {
+    list.innerHTML =
+      '<p class="text-xs opacity-30 italic text-center">Henüz yorum yok.</p>';
+  } else {
+    list.innerHTML = items.map(v => `
+      <div class="pb-4 border-b border-gray-800/10">
+        <div class="flex justify-between items-center mb-1">
+          <span class="font-bold text-sm uppercase break-words">${escapeHTML(v.u)}</span>
+          <span class="text-[9px] opacity-30">${v.time ? new Date(v.time).toLocaleString() : ""}</span>
+        </div>
+        <p class="text-[15px] opacity-90 break-words">${escapeHTML(v.t)}</p>
+        ${v.reply ? `
+          <div class="admin-reply-container">
+            <span class="admin-title">ADMİN YANITI</span>
+            <p class="admin-msg break-words">${escapeHTML(v.reply)}</p>
+          </div>
+        ` : ""}
+      </div>
+    `).join("");
+  }
+
+  const pag = document.getElementById("pagination");
+
+  if (allData.length > perPage) {
+    pag.classList.remove("hidden");
+    document.getElementById("pageInfo").innerText = "SAYFA " + currentPage;
+    document.getElementById("prevBtn").disabled = currentPage === 1;
+    document.getElementById("nextBtn").disabled =
+      start + perPage >= allData.length;
+  } else {
+    pag.classList.add("hidden");
+  }
+
+  resizeParent();
+}
+
+/* PAGINATION */
+document.getElementById("nextBtn").onclick = () => {
+  currentPage++;
+  render();
+};
+
+document.getElementById("prevBtn").onclick = () => {
+  currentPage--;
+  render();
+};
+
+/* SPAM LIMIT */
+let lastSubmit = 0;
+
+/* SUBMIT */
+document.getElementById("se-btn").onclick = async () => {
+  const t = textarea.value.trim();
+  const u = document.getElementById("se-u").value.trim() || "Anonim";
+  const btn = document.getElementById("se-btn");
+
+  if (!t) return;
+
+  if (Date.now() - lastSubmit < 5000) {
+    alert("Lütfen birkaç saniye bekleyin.");
+    return;
+  }
+
+  lastSubmit = Date.now();
+
+  btn.disabled = true;
+  btn.innerText = "GÖNDERİLİYOR...";
+
+  try {
+    await push(dbRef, {
+      u,
+      t,
+      approved: false,
+      time: Date.now()
+    });
+
+    textarea.value = "";
+    document.getElementById("charCount").innerText = "0 / 500";
+    alert("Yorumunuz onay için gönderildi.");
+
+  } catch (err) {
+    console.error(err);
+    alert("Bir hata oluştu. Lütfen tekrar deneyin.");
+  } finally {
+    btn.disabled = false;
+    btn.innerText = "YORUM GÖNDER";
+  }
+};
+</script>
+
 </body>
 </html>
