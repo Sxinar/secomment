@@ -1,76 +1,94 @@
-<div id="admin-app" style="max-width: 500px; margin: 40px auto; font-family: sans-serif; padding: 20px;">
-    <div id="login-card" style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1px solid #eee;">
-        <h2 style="text-align:center; color:#333;">Secoment Admin</h2>
-        <input type="email" id="email" placeholder="Email" style="width:100%; padding:12px; margin:10px 0; border:1px solid #ddd; border-radius:8px;">
-        <input type="password" id="pass" placeholder="Şifre" style="width:100%; padding:12px; margin:10px 0; border:1px solid #ddd; border-radius:8px;">
-        <button onclick="login()" style="width:100%; padding:14px; background:#333; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Giriş Yap</button>
+<div id="adm-app" style="max-width: 600px; margin: 0 auto; padding: 15px; font-family: sans-serif;">
+    <div id="login-box" style="text-align:center; padding: 50px 0;">
+        <h2>Admin Girişi</h2>
+        <input type="email" id="email" placeholder="E-posta" style="width:100%; padding:12px; margin-bottom:10px;">
+        <input type="password" id="pass" placeholder="Şifre" style="width:100%; padding:12px; margin-bottom:20px;">
+        <button onclick="login()" style="width:100%; padding:12px; background:#111; color:#fff; border:none; border-radius:8px;">Giriş Yap</button>
     </div>
 
-    <div id="panel" style="display:none;">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3>Onay Bekleyenler</h3>
-            <button onclick="location.reload()" style="font-size:12px;">Yenile</button>
+    <div id="dash" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h3>Yorum Yönetimi</h3>
+            <button onclick="logout()" style="background:none; border:none; color:red; cursor:pointer;">Çıkış</button>
         </div>
-        <div id="pending-list"></div>
+        <div id="admin-list"></div>
     </div>
 </div>
 
 <style>
-    .admin-item { background: #fff; border: 1px solid #e1e4e8; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
-    .btn-approve { background: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 5px; margin-right: 5px; cursor: pointer; }
-    .btn-delete { background: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
-    .page-tag { font-size: 11px; background: #eee; padding: 2px 6px; border-radius: 4px; color: #666; }
+    .adm-card { background:#fff; border:1px solid #ddd; border-radius:12px; padding:15px; margin-bottom:15px; box-shadow:0 2px 4px rgba(0,0,0,0.05); }
+    .adm-u { font-weight:700; color:#2563eb; }
+    .adm-t { margin: 8px 0; font-size:14px; }
+    .adm-actions { display:flex; gap:10px; margin-top:15px; }
+    .btn { padding:8px 12px; border:none; border-radius:6px; cursor:pointer; font-size:12px; font-weight:600; }
+    .btn-ok { background:#22c55e; color:#fff; }
+    .btn-del { background:#ef4444; color:#fff; }
+    .reply-box { margin-top:15px; display:none; }
+    .reply-input { width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; font-size:13px; }
 </style>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, collection, query, where, onSnapshot, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-    const firebaseConfig = {
+    const config = {
         apiKey: "AIzaSyAGw79xzO43dw5Vts7f2iV6vmA_BLxBJ1A",
         authDomain: "secoment.firebaseapp.com",
-        projectId: "secoment",
-        storageBucket: "secoment.firebasestorage.app",
-        messagingSenderId: "1028497467881",
-        appId: "1:1028497467881:web:b6af0d2301ec5323120378"
+        databaseURL: "https://secoment-default-rtdb.firebaseio.com",
+        projectId: "secoment"
     };
 
-    const app = initializeApp(firebaseConfig);
+    const app = initializeApp(config);
     const auth = getAuth(app);
-    const db = getFirestore(app);
+    const db = getDatabase(app);
 
-    window.login = () => {
-        const e = document.getElementById("email").value;
-        const p = document.getElementById("pass").value;
-        signInWithEmailAndPassword(auth, e, p).then(() => {
-            document.getElementById("login-card").style.display = "none";
-            document.getElementById("panel").style.display = "block";
-            load();
-        }).catch(err => alert("Hata: " + err.message));
-    };
+    window.login = () => signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('pass').value);
+    window.logout = () => signOut(auth);
 
-    function load() {
-        const q = query(collection(db, "comments"), where("approved", "==", false));
-        onSnapshot(q, (snap) => {
-            let h = "";
-            snap.forEach(d => {
-                const data = d.data();
-                h += `
-                <div class="admin-item">
-                    <div style="margin-bottom:10px;">
-                        <b>${data.name}</b> <span class="page-tag">${data.pageId}</span>
-                        <p style="margin:5px 0; font-size:14px; color:#444;">${data.text}</p>
-                    </div>
-                    <button class="btn-approve" onclick="approve('${d.id}')">Onayla</button>
-                    <button class="btn-delete" onclick="del('${d.id}')">Sil</button>
-                </div>`;
+    onAuthStateChanged(auth, (user) => {
+        document.getElementById('login-box').style.display = user ? 'none' : 'block';
+        document.getElementById('dash').style.display = user ? 'block' : 'none';
+        if(user) loadComments();
+    });
+
+    function loadComments() {
+        onValue(ref(db, 'comments'), (snap) => {
+            const list = document.getElementById("admin-list");
+            list.innerHTML = "";
+            snap.forEach((pageSnap) => {
+                const pId = pageSnap.key;
+                pageSnap.forEach((cSnap) => {
+                    const v = cSnap.val();
+                    const cId = cSnap.key;
+                    list.innerHTML += `
+                        <div class="adm-card">
+                            <div class="adm-u">${v.u} <small style="color:#999">(${pId})</small></div>
+                            <div class="adm-t">${v.t}</div>
+                            <div class="adm-actions">
+                                ${!v.approved ? `<button class="btn btn-ok" onclick="approve('${pId}','${cId}')">Onayla</button>` : `<span style="color:green; font-size:12px;">✅ Onaylı</span>`}
+                                <button class="btn" style="background:#eee" onclick="showReply('${cId}')">Yanıtla</button>
+                                <button class="btn btn-del" onclick="del('${pId}','${cId}')">Sil</button>
+                            </div>
+                            <div id="rb-${cId}" class="reply-box">
+                                <input type="text" id="ri-${cId}" class="reply-input" placeholder="Yanıtınız..." value="${v.reply || ''}">
+                                <button class="btn btn-ok" style="margin-top:5px; width:100%" onclick="saveReply('${pId}','${cId}')">Yanıtı Kaydet</button>
+                            </div>
+                        </div>`;
+                });
             });
-            document.getElementById("pending-list").innerHTML = h || "<p>Bekleyen yorum yok, harikasın!</p>";
         });
     }
 
-    window.approve = (id) => updateDoc(doc(db, "comments", id), { approved: true });
-    window.del = (id) => deleteDoc(doc(db, "comments", id));
-                          
+    window.approve = (p, c) => update(ref(db, `comments/${p}/${c}`), { approved: true });
+    window.del = (p, c) => confirm("Silinsin mi?") && remove(ref(db, `comments/${p}/${c}`));
+    window.showReply = (cId) => {
+        const box = document.getElementById(`rb-${cId}`);
+        box.style.display = box.style.display === 'block' ? 'none' : 'block';
+    };
+    window.saveReply = (p, c) => {
+        const txt = document.getElementById(`ri-${c}`).value;
+        update(ref(db, `comments/${p}/${c}`), { reply: txt, approved: true });
+        alert("Yanıt kaydedildi ve yorum onaylandı.");
+    };
 </script>
