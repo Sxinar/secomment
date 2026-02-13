@@ -1,30 +1,31 @@
 <!DOCTYPE html>
-<html>
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yorumlar</title>
+    <title>Yorumlar Widget</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { /* Light Mode Variables */
+        :root {
+            /* Arka plan tamamen şeffaf */
             --bg-color: transparent;
-            --card-bg: #ffffff;
+            /* Kartlar hafif şeffaf (Glassmorphism) */
+            --card-bg: rgba(255, 255, 255, 0.85); 
             --text-color: #1a202c;
             --sub-text-color: #4a5568;
-            --border-color: #e2e8f0;
+            --border-color: rgba(0, 0, 0, 0.1);
             --primary-color: #3182ce;
-            --input-bg: #f7fafc;
+            --input-bg: rgba(255, 255, 255, 0.9);
         }
 
         @media (prefers-color-scheme: dark) {
-            :root { /* Dark Mode Variables */
-                --bg-color: transparent;
-                --card-bg: #2d3748;
+            :root {
+                --card-bg: rgba(45, 55, 72, 0.85);
                 --text-color: #e2e8f0;
                 --sub-text-color: #a0aec0;
-                --border-color: #4a5568;
+                --border-color: rgba(255, 255, 255, 0.1);
                 --primary-color: #63b3ed;
-                --input-bg: #1a202c;
+                --input-bg: rgba(26, 32, 44, 0.9);
             }
         }
 
@@ -32,126 +33,109 @@
             font-family: 'Inter', sans-serif;
             margin: 0;
             padding: 15px;
-            background-color: var(--bg-color); /* Transparent background */
+            background-color: transparent !important;
             color: var(--text-color);
             line-height: 1.5;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
         }
 
         /* Yorum Listesi */
         #se-list {
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .se-item {
             background-color: var(--card-bg);
+            /* Arkadaki rengi yumuşatma efekti */
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 15px;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            transition: all 0.2s ease-in-out;
+            transition: transform 0.2s ease;
         }
 
         .se-item:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.08);
         }
 
         .se-u {
             font-weight: 700;
-            font-size: 1rem;
+            font-size: 0.95rem;
             color: var(--primary-color);
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             display: block;
         }
 
         .se-t {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: var(--text-color);
+            word-wrap: break-word;
         }
 
         .se-admin-reply {
-            margin-top: 15px;
-            padding: 10px 15px;
-            background-color: var(--input-bg);
+            margin-top: 12px;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.05);
             border-left: 3px solid var(--primary-color);
-            border-radius: 8px;
-            font-size: 0.9rem;
-            color: var(--sub-text-color);
+            border-radius: 6px;
+            font-size: 0.85rem;
         }
 
-        .se-admin-reply b {
-            color: var(--primary-color);
-            font-weight: 600;
-        }
-
-        /* Yorum Formu */
+        /* Form Alanı */
         .se-form-container {
             border-top: 1px solid var(--border-color);
-            padding-top: 25px;
+            padding-top: 20px;
         }
 
         input[type="text"],
         textarea {
             width: 100%;
             padding: 12px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
             box-sizing: border-box;
             background-color: var(--input-bg);
             color: var(--text-color);
-            font-size: 0.95rem;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-
-        input[type="text"]::placeholder,
-        textarea::placeholder {
-            color: var(--sub-text-color);
-            opacity: 0.7;
+            font-size: 0.9rem;
+            outline: none;
         }
 
         input[type="text"]:focus,
         textarea:focus {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.2);
-            outline: none;
+            box-shadow: 0 0 0 2px rgba(49, 130, 206, 0.2);
         }
 
         button {
             width: 100%;
-            padding: 12px 15px;
+            padding: 12px;
             background-color: var(--primary-color);
             color: white;
             border: none;
             border-radius: 8px;
             font-weight: 600;
-            font-size: 1rem;
             cursor: pointer;
-            transition: background-color 0.2s, transform 0.1s;
+            transition: opacity 0.2s;
         }
 
         button:hover {
-            background-color: #2c7bb6;
-        }
-
-        button:active {
-            transform: translateY(1px);
+            opacity: 0.9;
         }
 
         button:disabled {
-            background-color: var(--border-color);
-            color: var(--sub-text-color);
+            filter: grayscale(1);
             cursor: not-allowed;
         }
 
         .se-empty-message {
             text-align: center;
             color: var(--sub-text-color);
-            font-style: italic;
-            padding: 20px 0;
+            font-size: 0.9rem;
+            padding: 20px;
         }
     </style>
 </head>
@@ -163,7 +147,7 @@
 
     <div class="se-form-container">
         <input type="text" id="se-u" placeholder="Adınız">
-        <textarea id="se-t" placeholder="Yorumunuz onaylandıktan sonra görünecektir."></textarea>
+        <textarea id="se-t" rows="3" placeholder="Yorumunuzu buraya yazın..."></textarea>
         <button id="se-btn">Yorumu Gönder</button>
     </div>
 
@@ -171,11 +155,11 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, push, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // Firebase Konfigürasyonunuz (Kendi Bilgilerinizle Güncelleyin)
+        // Firebase Ayarları
         const config = {
             apiKey: "AIzaSyAGw79xzO43dw5Vts7f2iV6vmA_BLxBJ1A",
             authDomain: "secoment.firebaseapp.com",
-            databaseURL: "https://secoment-default-rtdb.firebaseio.com", // BURAYA KENDİ DATABASE URL'nizi YAPIŞTIRIN!
+            databaseURL: "https://secoment-default-rtdb.firebaseio.com",
             projectId: "secoment",
             appId: "1:1028497467881:web:b6af0d2301ec5323120378"
         };
@@ -183,90 +167,70 @@
         const app = initializeApp(config);
         const db = getDatabase(app);
 
-        // Sayfa ID'sini URL parametresinden veya varsayılan olarak al
         const params = new URLSearchParams(window.location.search);
-        const pageId = params.get('id') || "global"; // iframe'den id gelmezse 'global' kullan
+        const pageId = params.get('id') || "global";
         const dbRef = ref(db, 'comments/' + pageId);
 
-        // Yorumları Çekme ve Listeleme Fonksiyonu
+        // Listeleme
         onValue(dbRef, (snapshot) => {
             const listElement = document.getElementById("se-list");
             let htmlContent = "";
-            let commentCount = 0;
+            let count = 0;
 
             if (snapshot.exists()) {
-                snapshot.forEach((childSnapshot) => {
-                    const comment = childSnapshot.val();
-                    if (comment.approved) { // Sadece onaylı yorumları göster
-                        commentCount++;
-                        let replyHtml = comment.reply ? 
-                            `<div class="se-admin-reply"><b>Yönetici Yanıtı:</b> ${comment.reply}</div>` : '';
-                        
-                        htmlContent = `
+                const data = snapshot.val();
+                const keys = Object.keys(data).reverse(); // En yeni en üstte
+
+                keys.forEach(key => {
+                    const comment = data[key];
+                    if (comment.approved) {
+                        count++;
+                        let reply = comment.reply ? `<div class="se-admin-reply"><b>Yanıt:</b> ${comment.reply}</div>` : '';
+                        htmlContent += `
                             <div class="se-item">
-                                <div class="se-u">${comment.u}</div>
+                                <span class="se-u">${comment.u}</span>
                                 <div class="se-t">${comment.t}</div>
-                                ${replyHtml}
-                            </div>` + htmlContent; // En yeni yorum en üstte
+                                ${reply}
+                            </div>`;
                     }
                 });
             }
 
-            if (commentCount === 0) {
-                listElement.innerHTML = `<p class="se-empty-message">Henüz onaylanmış yorum bulunmuyor. İlk yorumu siz yapın!</p>`;
-            } else {
-                listElement.innerHTML = htmlContent;
-            }
-            
-            // Eğer iframe içindeysek, üst sayfaya yüksekliği bildir
-            if (window.parent) {
-                const height = document.body.scrollHeight;
-                window.parent.postMessage({ frameHeight: height }, '*');
-            }
+            listElement.innerHTML = count === 0 ? 
+                `<p class="se-empty-message">Henüz yorum yok. İlk yorumu siz yapın!</p>` : htmlContent;
         });
 
-        // Yorum Gönderme Fonksiyonu
-        document.getElementById("se-btn").addEventListener("click", async () => {
-            const userName = document.getElementById("se-u").value.trim();
-            const commentText = document.getElementById("se-t").value.trim();
-            
-            if (!userName || !commentText) {
-                alert("Lütfen adınızı ve yorumunuzu girin.");
-                return;
-            }
+        // Gönderme
+        document.getElementById("se-btn").onclick = async () => {
+            const u = document.getElementById("se-u").value.trim();
+            const t = document.getElementById("se-t").value.trim();
+            const btn = document.getElementById("se-btn");
 
-            const sendButton = document.getElementById("se-btn");
-            sendButton.disabled = true;
-            sendButton.innerText = "Gönderiliyor...";
+            if (!u || !t) return alert("Eksik bilgi!");
+
+            btn.disabled = true;
+            btn.innerText = "Gönderiliyor...";
 
             try {
-                await push(dbRef, { 
-                    u: userName, 
-                    t: commentText, 
-                    approved: false, // Yorumlar varsayılan olarak onaysız başlar
-                    time: serverTimestamp() 
-                });
-                alert("Yorumunuz başarıyla gönderildi ve yönetici onayı bekliyor.");
-                document.getElementById("se-t").value = ""; // Yorum kutusunu temizle
-            } catch (error) {
-                console.error("Yorum gönderme hatası:", error);
-                alert("Yorumunuz gönderilirken bir hata oluştu: " + error.message);
+                await push(dbRef, { u, t, approved: false, time: serverTimestamp() });
+                alert("Yorumunuz onaya gönderildi.");
+                document.getElementById("se-t").value = "";
+            } catch (e) {
+                alert("Hata oluştu.");
             } finally {
-                sendButton.disabled = false;
-                sendButton.innerText = "Yorumu Gönder";
-            }
-        });
-
-        // Iframe boyutunu ana sayfaya bildirme (her yüklendiğinde ve boyut değiştiğinde)
-        const sendHeightToParent = () => {
-            if (window.parent) {
-                const height = document.body.scrollHeight;
-                window.parent.postMessage({ frameHeight: height }, '*');
+                btn.disabled = false;
+                btn.innerText = "Yorumu Gönder";
             }
         };
-        window.addEventListener('load', sendHeightToParent);
-        new ResizeObserver(sendHeightToParent).observe(document.body);
 
+        // Yükseklik Bildirimi (Iframe için)
+        const updateHeight = () => {
+            if (window.parent) {
+                window.parent.postMessage({ frameHeight: document.body.scrollHeight }, '*');
+            }
+        };
+        new ResizeObserver(updateHeight).observe(document.body);
+        window.onload = updateHeight;
     </script>
 </body>
 </html>
