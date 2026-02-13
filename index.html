@@ -1,175 +1,286 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" class="scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secomment | Modern & Hafif Yorum Sistemi</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --bg-color: #0f172a;
-            --accent-color: #fbbf24;
-            --secondary-accent: #f59e0b;
-            --text-main: #f8fafc;
-            --text-dim: #94a3b8;
-            --card-bg: #1e293b;
-            --code-bg: #000000;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Secomment – Açık Kaynak Yorum Sistemi</title>
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; overflow-x: hidden; }
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={darkMode:'class'}</script>
 
-        .blob {
-            position: fixed;
-            width: 500px; height: 500px;
-            background: radial-gradient(circle, rgba(251, 191, 36, 0.05) 0%, rgba(15, 23, 42, 0) 70%);
-            z-index: -1; border-radius: 50%;
-        }
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
-        header {
-            height: 100vh; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; text-align: center; padding: 0 20px;
-        }
-
-        .hero-badge {
-            background: rgba(251, 191, 36, 0.1); color: var(--accent-color);
-            padding: 8px 20px; border-radius: 30px; font-size: 0.9rem;
-            font-weight: 600; margin-bottom: 20px; border: 1px solid rgba(251, 191, 36, 0.2);
-        }
-
-        h1 {
-            font-size: 4rem; font-weight: 800;
-            background: linear-gradient(to right, #fbbf24, #f59e0b);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            margin-bottom: 20px;
-        }
-
-        .hero-subtitle { font-size: 1.25rem; color: var(--text-dim); max-width: 600px; margin-bottom: 40px; }
-
-        .install-box {
-            background: var(--code-bg); padding: 15px 25px; border-radius: 12px;
-            display: flex; align-items: center; gap: 15px; border: 1px solid #334155;
-            cursor: pointer; transition: 0.2s;
-        }
-
-        .install-box:hover { border-color: var(--accent-color); transform: translateY(-2px); }
-        code { color: var(--accent-color); font-family: monospace; font-size: 0.95rem; }
-
-        .container { max-width: 1000px; margin: 100px auto; padding: 0 20px; }
-        h2 { text-align: center; margin-bottom: 50px; font-size: 2.5rem; }
-
-        .table-wrapper {
-            background: var(--card-bg); border-radius: 16px; padding: 20px;
-            border: 1px solid rgba(255,255,255,0.05); overflow-x: auto;
-        }
-
-        table { width: 100%; border-collapse: collapse; text-align: left; }
-        th { color: var(--accent-color); padding: 15px; border-bottom: 2px solid #334155; }
-        td { padding: 15px; border-bottom: 1px solid #334155; color: var(--text-dim); }
-
-        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin-top: 50px; }
-        .feature-card { background: var(--card-bg); padding: 30px; border-radius: 16px; border: 1px solid transparent; transition: 0.3s; }
-        .feature-card:hover { border-color: var(--accent-color); transform: translateY(-5px); }
-        .feature-card i { font-size: 2rem; color: var(--accent-color); margin-bottom: 20px; }
-
-        footer { text-align: center; padding: 100px 20px; color: var(--text-dim); }
-        .footer-link { color: var(--text-main); text-decoration: none; font-weight: 600; }
-
-        @media (max-width: 768px) { h1 { font-size: 2.5rem; } code { font-size: 0.7rem; } }
-    </style>
+<style>
+body{font-family:Inter,sans-serif}
+.fade-up{opacity:0;transform:translateY(30px);transition:.8s}
+.fade-up.show{opacity:1;transform:translateY(0)}
+</style>
 </head>
-<body>
 
-    <div class="blob" style="top: -100px; right: -100px;"></div>
-    <div class="blob" style="bottom: -100px; left: -100px;"></div>
+<body class="bg-white dark:bg-black text-slate-900 dark:text-white">
 
-    <header>
-        <div class="hero-badge">Statik Siteler İçin Dinamik Yorumlar</div>
-        <h1>💬 Secomment</h1>
-        <p class="hero-subtitle">
-            Firebase altyapılı, hafif, güvenli ve tamamen özelleştirilebilir gerçek zamanlı yorum sistemi.
-        </p>
-        
-        <div class="install-box" onclick="copyToClipboard()">
-            <code id="installCommand">&lt;iframe src="https://sxinar.github.io/secomment/widcom.html?id=sayfa1"&gt;&lt;/iframe&gt;</code>
-            <i class="fa-regular fa-copy" id="copyIcon"></i>
-        </div>
-        <p style="margin-top: 15px; font-size: 0.8rem; color: var(--text-dim);">Iframe kodunu kopyalayın</p>
-    </header>
+<!-- NAV -->
+<header class="fixed w-full z-50 bg-white/80 dark:bg-black/80 backdrop-blur border-b border-slate-200 dark:border-white/10">
+<div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+<h1 class="font-black text-xl">Secomment</h1>
 
-    <div class="container">
-        <h2>Neden Secomment?</h2>
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Özellik</th>
-                        <th>Geleneksel (Disqus vb.)</th>
-                        <th>Secomment</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Hız</td>
-                        <td>❌ Ağır Scriptler</td>
-                        <td>🚀 Ultra Hafif (RTDB)</td>
-                    </tr>
-                    <tr>
-                        <td>Reklamlar</td>
-                        <td>⚠️ Var / Takip</td>
-                        <td>✅ %100 Reklamsız</td>
-                    </tr>
-                    <tr>
-                        <td>Kontrol</td>
-                        <td>❌ Üçüncü Taraf</td>
-                        <td>✨ Kendi Veritabanın</td>
-                    </tr>
-                    <tr>
-                        <td>Moderasyon</td>
-                        <td>⚠️ Karmaşık Panel</td>
-                        <td>🛡️ Basit Onay Sistemi</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+<div class="hidden md:flex gap-8 text-sm font-semibold">
+<a href="#ozellikler">Özellikler</a>
+<a href="#karsilastirma">Karşılaştırma</a>
+<a href="#alternatifler">Alternatifler</a>
+<a href="#admin">Admin</a>
+<a href="#kurulum">Kurulum</a>
+<a href="#lisans">Lisans</a>
+</div>
 
-        <div class="features">
-            <div class="feature-card">
-                <i class="fa-solid fa-bolt"></i>
-                <h3>Gerçek Zamanlı</h3>
-                <p>Firebase Realtime Database ile yorumlar sayfa yenilenmeden anında görünür.</p>
-            </div>
-            <div class="feature-card">
-                <i class="fa-solid fa-shield-halved"></i>
-                <h3>Önce Onay</h3>
-                <p>Spam mesajları engelleyin. Tüm yorumlar siz onaylamadan yayınlanmaz.</p>
-            </div>
-            <div class="feature-card">
-                <i class="fa-solid fa-moon"></i>
-                <h3>Karanlık Mod</h3>
-                <p>Sitenizin temasına otomatik uyum sağlayan modern ve şeffaf tasarım.</p>
-            </div>
-        </div>
-    </div>
+<div class="flex gap-4 items-center">
+<button onclick="setLang('tr')" class="text-xs font-bold">TR</button>
+<button onclick="setLang('en')" class="text-xs font-bold">EN</button>
+<button onclick="toggleTheme()">🌗</button>
+</div>
+</div>
+</header>
 
-    <footer>
-        <p>Made with ❤️ by <a href="https://github.com/Sxinar" class="footer-link">Sxinar</a></p>
-    </footer>
+<!-- HERO -->
+<section class="pt-40 pb-28 px-6 text-center">
+<div class="max-w-4xl mx-auto fade-up">
+<h2 class="text-4xl md:text-6xl font-black leading-tight">
+Açık Kaynak Self-Host Yorum Sistemi
+</h2>
+<p class="mt-6 text-lg text-slate-500 dark:text-slate-400">
+Statik siteler için hafif, güvenli ve gerçek zamanlı yorum altyapısı.
+</p>
 
-    <script>
-        function copyToClipboard() {
-            const command = document.getElementById('installCommand').innerText;
-            navigator.clipboard.writeText(command).then(() => {
-                const icon = document.getElementById('copyIcon');
-                icon.classList.replace('fa-regular', 'fa-solid');
-                icon.classList.replace('fa-check', 'fa-copy');
-                icon.style.color = '#4ade80';
-                setTimeout(() => {
-                    icon.classList.replace('fa-solid', 'fa-regular');
-                    icon.style.color = '';
-                }, 2000);
-            });
-        }
-    </script>
+<div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+<a href="#kurulum" class="px-8 py-4 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 transition">
+Başla
+</a>
+<a href="https://github.com/sxinar/secomment" target="_blank"
+class="px-8 py-4 border border-slate-300 dark:border-white/20 rounded-2xl font-bold hover:bg-slate-100 dark:hover:bg-white/10 transition">
+GitHub
+</a>
+</div>
+</div>
+</section>
+
+<!-- STATS -->
+<section class="py-20 px-6 bg-slate-50 dark:bg-[#050505] text-center">
+<div class="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-10">
+
+<div>
+<div id="commentCount" class="text-3xl font-black text-blue-600">—</div>
+<p class="text-sm text-slate-500">Toplam Yorum</p>
+</div>
+
+<div>
+<div class="text-3xl font-black text-blue-600">~12KB</div>
+<p class="text-sm text-slate-500">Embed Boyutu</p>
+</div>
+
+<div>
+<div id="githubStars" class="text-3xl font-black text-blue-600">—</div>
+<p class="text-sm text-slate-500">GitHub ⭐</p>
+</div>
+
+<div>
+<div class="text-3xl font-black text-blue-600">0</div>
+<p class="text-sm text-slate-500">Reklam</p>
+</div>
+
+</div>
+</section>
+
+<!-- ÖZELLİKLER -->
+<section id="ozellikler" class="py-24 px-6 text-center">
+<div class="max-w-5xl mx-auto grid md:grid-cols-3 gap-12">
+<div><h3 class="font-bold text-xl mb-4">⚡ Hafif</h3><p class="text-slate-500">Tracking script içermez.</p></div>
+<div><h3 class="font-bold text-xl mb-4">🔐 Self-Host</h3><p class="text-slate-500">Veri tamamen sizde.</p></div>
+<div><h3 class="font-bold text-xl mb-4">🔥 Gerçek Zamanlı</h3><p class="text-slate-500">Firebase ile anlık güncellenir.</p></div>
+</div>
+</section>
+
+<!-- KARŞILAŞTIRMA -->
+<section id="karsilastirma" class="py-24 px-6 bg-slate-50 dark:bg-[#050505]">
+<div class="max-w-6xl mx-auto text-center mb-14">
+<h2 class="text-4xl font-black">Neden Secomment, Disqus Değil?</h2>
+</div>
+
+<div class="overflow-x-auto">
+<table class="min-w-full border-collapse bg-white dark:bg-black border dark:border-white/10">
+<thead class="bg-slate-100 dark:bg-white/5">
+<tr>
+<th class="p-4">Özellik</th>
+<th class="p-4 text-blue-600">Secomment</th>
+<th class="p-4">Disqus</th>
+</tr>
+</thead>
+<tbody>
+<tr class="border-t dark:border-white/10">
+<td class="p-4">Reklam</td>
+<td class="p-4 text-green-600">Yok</td>
+<td class="p-4 text-red-500">Var</td>
+</tr>
+
+<tr class="border-t dark:border-white/10">
+<td class="p-4">Self-Host</td>
+<td class="p-4 text-green-600">Evet</td>
+<td class="p-4 text-red-500">Hayır</td>
+</tr>
+
+<tr class="border-t dark:border-white/10">
+<td class="p-4">Açık Kaynak</td>
+<td class="p-4 text-green-600">Evet</td>
+<td class="p-4 text-red-500">Hayır</td>
+</tr>
+
+<tr class="border-t dark:border-white/10">
+<td class="p-4">Embed Boyutu</td>
+<td class="p-4 text-green-600">~12KB</td>
+<td class="p-4 text-red-500">100KB+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<!-- ALTERNATİFLER -->
+<section id="alternatifler" class="py-24 px-6 text-center">
+<h2 class="text-4xl font-black mb-14">Alternatifler</h2>
+
+<div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-10">
+
+<div class="border p-8 rounded-3xl dark:border-white/10">
+<h3 class="font-bold text-xl mb-4">Giscus</h3>
+<p class="text-slate-500 text-sm">
+GitHub Discussions tabanlı. Açık kaynak fakat GitHub’a bağımlıdır.
+</p>
+</div>
+
+<div class="border p-8 rounded-3xl dark:border-white/10">
+<h3 class="font-bold text-xl mb-4">Commento</h3>
+<p class="text-slate-500 text-sm">
+Minimal ve hafif yorum sistemi. Self-host seçeneği vardır.
+</p>
+</div>
+
+<div class="border p-8 rounded-3xl dark:border-white/10">
+<h3 class="font-bold text-xl mb-4">Disqus</h3>
+<p class="text-slate-500 text-sm">
+Popüler fakat reklam ve tracking içerir.
+</p>
+</div>
+
+</div>
+</section>
+
+<!-- ADMIN PREVIEW -->
+<section id="admin" class="py-24 px-6 bg-slate-50 dark:bg-[#050505] text-center">
+<h2 class="text-4xl font-black mb-12">Admin Panel Önizleme</h2>
+
+<div class="max-w-4xl mx-auto bg-white dark:bg-black border dark:border-white/10 rounded-3xl p-8 text-left">
+<p class="font-semibold">Yorum Moderasyonu</p>
+<p class="text-sm text-slate-500 mt-2">
+Bekleyen yorumları onaylayabilir veya silebilirsiniz.
+</p>
+</div>
+</section>
+
+<!-- KURULUM -->
+<section id="kurulum" class="py-24 px-6 text-center">
+<h2 class="text-4xl font-black mb-10">Kurulum</h2>
+
+<pre class="bg-black text-green-400 p-6 rounded-2xl overflow-x-auto text-sm max-w-3xl mx-auto text-left">
+&lt;iframe src="https://yourdomain.com/widget.html?id=post-id"&gt;&lt;/iframe&gt;
+</pre>
+
+</section>
+
+<!-- LİSANS -->
+<section id="lisans" class="py-24 px-6 bg-slate-50 dark:bg-[#050505] text-center">
+<h2 class="text-4xl font-black mb-12">Lisans</h2>
+
+<div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-10">
+
+<div class="border-2 border-blue-600 p-10 rounded-3xl">
+<h3 class="text-2xl font-bold mb-4 text-blue-600">Açık Kaynak</h3>
+<p class="text-5xl font-black mb-4">Ücretsiz</p>
+<p>Self-host • MIT License</p>
+</div>
+
+<div class="border p-10 rounded-3xl opacity-40 relative">
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="text-6xl font-black text-red-500 rotate-[-20deg]">İPTAL</span>
+</div>
+<h3 class="text-2xl font-bold mb-4 line-through">Pro Plan</h3>
+<p class="text-5xl font-black line-through">$9/ay</p>
+</div>
+
+</div>
+</section>
+
+<footer class="py-10 text-center text-slate-400 border-t border-slate-200 dark:border-white/10">
+© 2026 Secomment
+</footer>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+const firebaseConfig = {
+apiKey: "AIzaSyAGw79xzO43dw5Vts7f2iV6vmA_BLxBJ1A",
+authDomain: "secoment.firebaseapp.com",
+databaseURL: "https://secoment-default-rtdb.firebaseio.com",
+projectId: "secoment"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+get(ref(db,"comments")).then(snapshot=>{
+let count=0;
+snapshot.forEach(page=>{page.forEach(()=>count++)});
+document.getElementById("commentCount").innerText=count;
+});
+</script>
+
+<script>
+// GitHub Stars Cache
+const cacheKey="ghStars";
+const cacheTime=3600000;
+
+async function loadStars(){
+const cached=JSON.parse(localStorage.getItem(cacheKey)||"null");
+
+if(cached && Date.now()-cached.time<cacheTime){
+document.getElementById("githubStars").innerText=cached.value;
+return;
+}
+
+const res=await fetch("https://api.github.com/repos/sxinar/secomment");
+const data=await res.json();
+
+localStorage.setItem(cacheKey,JSON.stringify({
+value:data.stargazers_count,
+time:Date.now()
+}));
+
+document.getElementById("githubStars").innerText=data.stargazers_count;
+}
+loadStars();
+
+function toggleTheme(){
+document.documentElement.classList.toggle("dark");
+}
+
+function setLang(){ /* placeholder */ }
+
+// animation
+const observer=new IntersectionObserver(entries=>{
+entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add("show") })
+});
+document.querySelectorAll(".fade-up").forEach(el=>observer.observe(el));
+</script>
+
 </body>
 </html>
