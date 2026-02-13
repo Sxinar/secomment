@@ -5,17 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* ARKA PLANI SİLEN KRİTİK AYARLAR */
+        /* CSS İLE ŞEFFAFLIK ZORLAMASI */
+        :root { background: transparent !important; }
         html, body { 
             background: transparent !important; 
-            background-color: transparent !important; 
-            color: inherit; 
+            background-color: transparent !important;
+            color: inherit; /* Sitenin yazı rengini alır */
             margin: 0; padding: 0;
         }
 
-        /* Kutucukların iç rengi (görseldeki gibi koyu kalsın) */
+        /* Kutucuklar - Görseldeki Koyu Gri Tonu */
         .input-box {
-            background-color: #2d3748 !important; /* Koyu Gri-Mavi */
+            background-color: #2d3748 !important;
             border: 1px solid #4a5568;
             border-radius: 4px;
             color: #ffffff;
@@ -24,6 +25,7 @@
             outline: none;
         }
 
+        /* Buton Stili */
         .btn-submit {
             background-color: #3f4a5e;
             color: white;
@@ -32,53 +34,49 @@
             font-weight: 700;
             text-transform: uppercase;
             cursor: pointer;
-            width: fit-content;
         }
         .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        /* Admin Yanıtı (Görseldeki mavi çizgili stil) */
-        .admin-reply-box {
-            border-left: 3px solid #3b82f6; /* Mavi dikey çizgi */
+        /* Admin Yanıtı - Görseldeki Stil */
+        .admin-reply-container {
+            border-left: 3px solid #3b82f6;
             margin-top: 10px;
             padding-left: 12px;
-            margin-left: 4px;
         }
-        .admin-label {
+        .admin-title {
             color: #3b82f6;
-            font-size: 10px;
-            font-weight: 800;
+            font-size: 11px;
+            font-weight: 900;
             text-transform: uppercase;
             font-style: italic;
+            display: block;
+            margin-bottom: 2px;
         }
-        .admin-text {
-            color: inherit;
-            opacity: 0.8;
+        .admin-msg {
             font-style: italic;
-            font-size: 13px;
+            opacity: 0.8;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
 
     <div class="max-w-2xl mx-auto space-y-5 p-2">
-        
         <div class="space-y-4">
-            <div class="space-y-4">
-                <input type="text" id="se-u" class="input-box text-sm" placeholder="Nickname">
-                <input type="email" class="input-box text-sm" placeholder="Email (isteğe bağlı)">
-                <textarea id="se-t" rows="4" class="input-box text-sm" placeholder="Yorumunuz..."></textarea>
-            </div>
+            <input type="text" id="se-u" class="input-box text-sm" placeholder="Nickname">
+            <input type="email" class="input-box text-sm" placeholder="Email (isteğe bağlı)">
+            <textarea id="se-t" rows="4" class="input-box text-sm" placeholder="Yorumunuz..."></textarea>
             <button id="se-btn" class="btn-submit text-sm">Yorum Gönder</button>
         </div>
 
-        <div class="border-t border-gray-700/30 my-6"></div>
+        <div class="border-t border-gray-700/20 my-6"></div>
 
-        <div id="se-list" class="space-y-8"></div>
+        <div id="se-list" class="space-y-6"></div>
 
         <div id="pagination" class="flex items-center justify-between pt-6 hidden">
-            <button id="prevBtn" class="text-xs font-bold opacity-60 hover:opacity-100 uppercase tracking-tighter">← Geri</button>
+            <button id="prevBtn" class="text-xs font-bold opacity-50 hover:opacity-100 uppercase">← Geri</button>
             <span id="pageInfo" class="text-[10px] opacity-40 font-bold uppercase">Sayfa 1</span>
-            <button id="nextBtn" class="text-xs font-bold opacity-60 hover:opacity-100 uppercase tracking-tighter">İleri →</button>
+            <button id="nextBtn" class="text-xs font-bold opacity-50 hover:opacity-100 uppercase">İleri →</button>
         </div>
     </div>
 
@@ -112,29 +110,29 @@
                 });
                 allData.sort((a, b) => b.time - a.time);
             }
-            draw();
+            render();
         });
 
-        function draw() {
+        function render() {
             const list = document.getElementById("se-list");
             const start = (currentPage - 1) * perPage;
             const items = allData.slice(start, start + perPage);
 
             list.innerHTML = items.map(v => `
-                <div class="pb-6 border-b border-gray-800/10 last:border-0">
+                <div class="pb-4 border-b border-gray-800/10">
                     <div class="flex justify-between items-center mb-1">
-                        <span class="font-bold text-sm uppercase tracking-wide">${v.u}</span>
-                        <span class="text-[9px] opacity-40">${new Date(v.time).toLocaleString()}</span>
+                        <span class="font-bold text-sm uppercase">${v.u}</span>
+                        <span class="text-[9px] opacity-30">${new Date(v.time).toLocaleString()}</span>
                     </div>
-                    <p class="text-[15px] opacity-90 leading-snug">${v.t}</p>
+                    <p class="text-[15px] opacity-90">${v.t}</p>
                     ${v.reply ? `
-                        <div class="admin-reply-box">
-                            <span class="admin-label">Admin Yanıtı</span>
-                            <p class="admin-text">${v.reply}</p>
+                        <div class="admin-reply-container">
+                            <span class="admin-title">ADMİN YANITI</span>
+                            <p class="admin-msg">${v.reply}</p>
                         </div>
                     ` : ''}
                 </div>
-            `).join('') || '<p class="text-xs opacity-30 italic">Henüz yorum yok.</p>';
+            `).join('') || '<p class="text-xs opacity-30 italic text-center">Henüz yorum yok.</p>';
 
             const pag = document.getElementById("pagination");
             if (allData.length > perPage) {
@@ -145,8 +143,8 @@
             }
         }
 
-        document.getElementById("nextBtn").onclick = () => { currentPage++; draw(); };
-        document.getElementById("prevBtn").onclick = () => { currentPage--; draw(); };
+        document.getElementById("nextBtn").onclick = () => { currentPage++; render(); window.scrollTo(0,0); };
+        document.getElementById("prevBtn").onclick = () => { currentPage--; render(); window.scrollTo(0,0); };
 
         document.getElementById("se-btn").onclick = async () => {
             const t = document.getElementById("se-t").value.trim();
