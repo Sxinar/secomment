@@ -10,31 +10,39 @@ html, body {
   background: transparent !important;
   margin: 0;
   padding: 0;
+  color: inherit;
+  font-family: inherit;
 }
 
+/* INPUTLAR TEMA UYUMLU */
 .input-box {
-  background-color: #2d3748;
-  border: 1px solid #4a5568;
-  border-radius: 6px;
-  color: #fff;
+  background: var(--card-bg, transparent);
+  border: 1px solid var(--main-border-color, #ccc);
+  border-radius: 8px;
   padding: 12px;
   width: 100%;
   outline: none;
+  color: inherit;
 }
 
+.input-box::placeholder {
+  opacity: .6;
+}
+
+/* BUTON */
 .btn-submit {
-  background-color: #3f4a5e;
+  background: var(--btn-bg, #3b82f6);
   color: white;
-  padding: 12px 24px;
-  border-radius: 6px;
-  font-weight: 700;
-  text-transform: uppercase;
-  cursor: pointer;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  width: 100%;
   transition: .2s;
 }
 .btn-submit:hover { opacity:.9 }
 .btn-submit:disabled { opacity:.6; cursor:not-allowed }
 
+/* ADMIN */
 .admin-reply-container {
   border-left: 3px solid #3b82f6;
   margin-top: 10px;
@@ -44,7 +52,7 @@ html, body {
 .admin-title {
   color: #3b82f6;
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 700;
   text-transform: uppercase;
   font-style: italic;
 }
@@ -61,25 +69,38 @@ html, body {
 </head>
 <body>
 
-<div class="max-w-2xl mx-auto space-y-6 p-3">
+<div class="w-full space-y-6">
 
+  <!-- FORM -->
   <div class="space-y-4">
     <input type="text" id="se-u" class="input-box text-sm" placeholder="Nickname">
     <textarea id="se-t" rows="4" maxlength="500" class="input-box text-sm" placeholder="Yorumunuz..."></textarea>
+
     <div class="flex justify-between items-center text-xs opacity-50">
       <span id="charCount">0 / 500</span>
     </div>
-    <button id="se-btn" class="btn-submit text-sm w-full">YORUM GÖNDER</button>
+
+    <button id="se-btn" class="btn-submit text-sm">
+      YORUM GÖNDER
+    </button>
   </div>
 
-  <div class="border-t border-gray-700/20"></div>
+  <div class="border-t border-[var(--main-border-color)]"></div>
 
+  <!-- YORUMLAR -->
   <div id="se-list" class="space-y-6"></div>
 
+  <!-- PAGINATION -->
   <div id="pagination" class="flex items-center justify-between pt-6 hidden">
-    <button id="prevBtn" class="text-xs font-bold uppercase opacity-50 hover:opacity-100">← Geri</button>
-    <span id="pageInfo" class="text-[10px] opacity-40 font-bold uppercase">Sayfa 1</span>
-    <button id="nextBtn" class="text-xs font-bold uppercase opacity-50 hover:opacity-100">İleri →</button>
+    <button id="prevBtn" class="text-xs font-bold uppercase opacity-50 hover:opacity-100">
+      ← Geri
+    </button>
+    <span id="pageInfo" class="text-[10px] opacity-40 font-bold uppercase">
+      Sayfa 1
+    </span>
+    <button id="nextBtn" class="text-xs font-bold uppercase opacity-50 hover:opacity-100">
+      İleri →
+    </button>
   </div>
 
 </div>
@@ -106,8 +127,8 @@ let allData = [];
 let currentPage = 1;
 const perPage = 5;
 
-/* XSS ESCAPE */
-function escapeHTML(str = "") {
+/* XSS */
+function escapeHTML(str="") {
   return str.replace(/[&<>"']/g, m => ({
     '&':'&amp;',
     '<':'&lt;',
@@ -117,11 +138,13 @@ function escapeHTML(str = "") {
   }[m]));
 }
 
-/* AUTO RESIZE */
+/* RESIZE */
 function resizeParent() {
   setTimeout(() => {
-    const height = document.body.scrollHeight;
-    parent.postMessage({ type:'resize', height }, '*');
+    parent.postMessage({
+      type:'resize',
+      height: document.body.scrollHeight
+    }, '*');
   }, 100);
 }
 
@@ -132,13 +155,12 @@ textarea.addEventListener("input", () => {
     textarea.value.length + " / 500";
 });
 
-/* DATA */
+/* LOAD DATA */
 onValue(dbRef, snap => {
   allData = [];
 
   if (snap.exists()) {
-    const data = snap.val();
-    allData = Object.values(data)
+    allData = Object.values(snap.val())
       .filter(v => v.approved)
       .map(v => ({ ...v, time: v.time || 0 }))
       .sort((a,b) => b.time - a.time);
@@ -154,19 +176,29 @@ function render() {
 
   if (!items.length) {
     list.innerHTML =
-      '<p class="text-xs opacity-30 italic text-center">Henüz yorum yok.</p>';
+      '<p class="text-xs opacity-40 italic text-center">Henüz yorum yok.</p>';
   } else {
     list.innerHTML = items.map(v => `
-      <div class="pb-4 border-b border-gray-800/10">
+      <div class="pb-4 border-b border-[var(--main-border-color)]">
         <div class="flex justify-between items-center mb-1">
-          <span class="font-bold text-sm uppercase break-words">${escapeHTML(v.u)}</span>
-          <span class="text-[9px] opacity-30">${v.time ? new Date(v.time).toLocaleString() : ""}</span>
+          <span class="font-semibold text-sm uppercase break-words">
+            ${escapeHTML(v.u)}
+          </span>
+          <span class="text-[10px] opacity-40">
+            ${v.time ? new Date(v.time).toLocaleString() : ""}
+          </span>
         </div>
-        <p class="text-[15px] opacity-90 break-words">${escapeHTML(v.t)}</p>
+
+        <p class="text-[15px] opacity-90 break-words">
+          ${escapeHTML(v.t)}
+        </p>
+
         ${v.reply ? `
           <div class="admin-reply-container">
-            <span class="admin-title">ADMİN YANITI</span>
-            <p class="admin-msg break-words">${escapeHTML(v.reply)}</p>
+            <span class="admin-title">Admin Yanıtı</span>
+            <p class="admin-msg break-words">
+              ${escapeHTML(v.reply)}
+            </p>
           </div>
         ` : ""}
       </div>
@@ -177,7 +209,8 @@ function render() {
 
   if (allData.length > perPage) {
     pag.classList.remove("hidden");
-    document.getElementById("pageInfo").innerText = "SAYFA " + currentPage;
+    document.getElementById("pageInfo").innerText =
+      "Sayfa " + currentPage;
     document.getElementById("prevBtn").disabled = currentPage === 1;
     document.getElementById("nextBtn").disabled =
       start + perPage >= allData.length;
@@ -199,10 +232,9 @@ document.getElementById("prevBtn").onclick = () => {
   render();
 };
 
-/* SPAM LIMIT */
+/* SUBMIT */
 let lastSubmit = 0;
 
-/* SUBMIT */
 document.getElementById("se-btn").onclick = async () => {
   const t = textarea.value.trim();
   const u = document.getElementById("se-u").value.trim() || "Anonim";
@@ -210,13 +242,12 @@ document.getElementById("se-btn").onclick = async () => {
 
   if (!t) return;
 
-  if (Date.now() - lastSubmit < 5000) {
+  if (Date.now() - lastSubmit < 4000) {
     alert("Lütfen birkaç saniye bekleyin.");
     return;
   }
 
   lastSubmit = Date.now();
-
   btn.disabled = true;
   btn.innerText = "GÖNDERİLİYOR...";
 
@@ -231,10 +262,9 @@ document.getElementById("se-btn").onclick = async () => {
     textarea.value = "";
     document.getElementById("charCount").innerText = "0 / 500";
     alert("Yorumunuz onay için gönderildi.");
-
   } catch (err) {
+    alert("Bir hata oluştu.");
     console.error(err);
-    alert("Bir hata oluştu. Lütfen tekrar deneyin.");
   } finally {
     btn.disabled = false;
     btn.innerText = "YORUM GÖNDER";
