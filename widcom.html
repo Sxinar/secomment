@@ -5,62 +5,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Arka planı tamamen zorla şeffaf yapıyoruz */
-        body, html { background: transparent !important; color: inherit; }
+        /* Web sitesi rengine uyum sağlaması için tamamen şeffaf */
+        body, html { 
+            background: transparent !important; 
+            color: inherit; 
+            margin: 0; 
+            padding: 0;
+        }
         
-        /* Kutucuklar: Sadece çerçeve ve şeffaf iç alan */
-        .input-outline {
-            background: transparent;
-            border: 1px solid #4b5563; /* Orta gri çerçeve */
+        /* Kutucuklar: Görseldeki koyu arka planı koruyoruz */
+        .input-box {
+            background-color: #2d3748; /* Görseldeki koyu gri/mavi ton */
+            border: 1px solid #4a5568;
             border-radius: 4px;
-            color: inherit;
-            padding: 10px;
+            color: #ffffff;
+            padding: 12px;
             width: 100%;
             outline: none;
         }
-        .input-outline:focus { border-color: #3b82f6; }
+        .input-box:focus { border-color: #3b82f6; }
 
-        /* Buton: Sade ve belirgin */
-        .btn-send {
+        /* Buton: Sade ve durum bildirimi yapan yapı */
+        .btn-submit {
             background-color: #374151;
             color: white;
-            padding: 8px 20px;
+            padding: 10px 24px;
             border-radius: 4px;
             font-weight: 600;
-            transition: opacity 0.2s;
+            transition: all 0.2s;
+            cursor: pointer;
         }
-        .btn-send:hover { opacity: 0.8; }
+        .btn-submit:hover:not(:disabled) { opacity: 0.8; }
+        .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* Sayfalama butonları */
-        .btn-nav {
-            border: 1px solid #4b5563;
-            padding: 5px 15px;
-            border-radius: 4px;
+        /* Sayfalama */
+        .nav-link {
             font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            opacity: 0.6;
         }
+        .nav-link:hover:not(:disabled) { opacity: 1; }
     </style>
 </head>
-<body class="p-2">
+<body class="p-4">
 
-    <div class="max-w-2xl mx-auto space-y-4">
+    <div class="max-w-2xl mx-auto space-y-5">
         
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <input type="text" id="se-u" class="input-outline text-sm" placeholder="Nickname">
-            <input type="email" class="input-outline text-sm" placeholder="Email (isteğe bağlı)">
+        <div class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input type="text" id="se-u" class="input-box text-sm" placeholder="Nickname">
+                <input type="email" class="input-box text-sm" placeholder="Email (isteğe bağlı)">
+            </div>
+            <textarea id="se-t" rows="4" class="input-box text-sm" placeholder="Yorumunuz..."></textarea>
+            <button id="se-btn" class="btn-submit text-sm uppercase tracking-wide">Yorum Gönder</button>
         </div>
-        <textarea id="se-t" rows="3" class="input-outline text-sm" placeholder="Yorumunuz..."></textarea>
-        
-        <button id="se-btn" class="btn-send text-sm">Yorum Gönder</button>
 
-        <div class="border-t border-gray-700 my-4"></div>
+        <div class="border-t border-gray-700/50 my-6"></div>
 
         <div id="se-list" class="space-y-6">
             </div>
 
-        <div id="pagination" class="flex items-center justify-between pt-4 hidden">
-            <button id="prevBtn" class="btn-nav">Geri</button>
-            <span id="pageInfo" class="text-xs uppercase tracking-widest opacity-50">Sayfa 1</span>
-            <button id="nextBtn" class="btn-nav">İleri</button>
+        <div id="pagination" class="flex items-center justify-between pt-6 hidden">
+            <button id="prevBtn" class="nav-link">← Geri</button>
+            <span id="pageInfo" class="text-[10px] opacity-40 font-bold tracking-widest">SAYFA 1</span>
+            <button id="nextBtn" class="nav-link">İleri →</button>
         </div>
     </div>
 
@@ -81,56 +92,75 @@
         const pageId = params.get('id') || "global";
         const dbRef = ref(db, 'comments/' + pageId);
 
-        let allComments = [];
+        let allData = [];
         let currentPage = 1;
         const perPage = 5;
 
         onValue(dbRef, (snap) => {
-            allComments = [];
+            allData = [];
             if (snap.exists()) {
                 const data = snap.val();
                 Object.keys(data).forEach(k => {
-                    if (data[k].approved) allComments.push(data[k]);
+                    if (data[k].approved) allData.push(data[k]);
                 });
-                allComments.sort((a, b) => b.time - a.time);
+                allData.sort((a, b) => b.time - a.time);
             }
-            render();
+            draw();
         });
 
-        function render() {
+        function draw() {
             const list = document.getElementById("se-list");
             const start = (currentPage - 1) * perPage;
-            const paged = allComments.slice(start, start + perPage);
+            const items = allData.slice(start, start + perPage);
 
-            list.innerHTML = paged.map(v => `
-                <div class="border-b border-gray-800 pb-4">
-                    <div class="flex justify-between text-xs mb-1">
-                        <span class="font-bold">${v.u}</span>
-                        <span class="opacity-40">${new Date(v.time).toLocaleDateString()}</span>
+            list.innerHTML = items.map(v => `
+                <div class="border-b border-gray-800/30 pb-4">
+                    <div class="flex justify-between items-baseline mb-2">
+                        <span class="font-bold text-sm">${v.u}</span>
+                        <span class="text-[10px] opacity-30 italic">${new Date(v.time).toLocaleDateString()}</span>
                     </div>
-                    <p class="text-sm opacity-80">${v.t}</p>
+                    <p class="text-[14px] leading-relaxed opacity-80">${v.t}</p>
                 </div>
-            `).join('') || '<p class="text-xs opacity-40 italic">Henüz yorum yok.</p>';
+            `).join('') || '<p class="text-xs opacity-30 italic">Sohbeti başlatan ilk kişi olun...</p>';
 
             const pag = document.getElementById("pagination");
-            if (allComments.length > perPage) {
+            if (allData.length > perPage) {
                 pag.classList.remove("hidden");
-                document.getElementById("pageInfo").innerText = `Sayfa ${currentPage}`;
+                document.getElementById("pageInfo").innerText = `SAYFA ${currentPage}`;
                 document.getElementById("prevBtn").disabled = currentPage === 1;
-                document.getElementById("nextBtn").disabled = start + perPage >= allComments.length;
+                document.getElementById("nextBtn").disabled = start + perPage >= allData.length;
             }
         }
 
-        document.getElementById("nextBtn").onclick = () => { currentPage++; render(); };
-        document.getElementById("prevBtn").onclick = () => { currentPage--; render(); };
+        document.getElementById("nextBtn").onclick = () => { currentPage++; draw(); };
+        document.getElementById("prevBtn").onclick = () => { currentPage--; draw(); };
 
         document.getElementById("se-btn").onclick = async () => {
             const u = document.getElementById("se-u").value.trim();
             const t = document.getElementById("se-t").value.trim();
+            const btn = document.getElementById("se-btn");
+
             if (!t) return;
-            await push(dbRef, { u: u || 'Anonim', t, approved: false, time: serverTimestamp() });
-            alert("Onay bekleniyor.");
-            document.getElementById("se-t").value = "";
+
+            // Buton Durumu Değiştirme
+            btn.disabled = true;
+            btn.innerText = "GÖNDERİLİYOR...";
+
+            try {
+                await push(dbRef, { 
+                    u: u || 'Anonim', 
+                    t, 
+                    approved: false, 
+                    time: serverTimestamp() 
+                });
+                alert("Mesajınız iletildi, onay sonrası yayınlanacaktır.");
+                document.getElementById("se-t").value = "";
+            } catch (err) {
+                alert("Hata oluştu.");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "YORUM GÖNDER";
+            }
         };
     </script>
 </body>
