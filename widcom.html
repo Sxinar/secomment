@@ -3,234 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yorumlar Widget</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>SekoMent Dynamic Widget</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root {
-            /* Arka plan tamamen şeffaf */
-            --bg-color: transparent;
-            /* Kartlar hafif şeffaf (Glassmorphism) */
-            --card-bg: rgba(255, 255, 255, 0.85); 
-            --text-color: #1a202c;
-            --sub-text-color: #4a5568;
-            --border-color: rgba(0, 0, 0, 0.1);
-            --primary-color: #3182ce;
-            --input-bg: rgba(255, 255, 255, 0.9);
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: transparent !important; }
+        
+        .reply-thread {
+            border-left: 2px solid #e2e8f0;
+            margin-left: 1rem;
+            padding-left: 1.5rem;
         }
+        .dark .reply-thread { border-left-color: #334155; }
 
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --card-bg: rgba(45, 55, 72, 0.85);
-                --text-color: #e2e8f0;
-                --sub-text-color: #a0aec0;
-                --border-color: rgba(255, 255, 255, 0.1);
-                --primary-color: #63b3ed;
-                --input-bg: rgba(26, 32, 44, 0.9);
-            }
+        .form-input {
+            background-color: #ffffff;
+            border: 1px solid #d1d5db;
+            transition: all 0.2s;
         }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding: 15px;
-            background-color: transparent !important;
-            color: var(--text-color);
-            line-height: 1.5;
-            overflow-x: hidden;
+        .dark .form-input {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            color: #f1f5f9;
         }
-
-        /* Yorum Listesi */
-        #se-list {
-            margin-bottom: 25px;
-        }
-
-        .se-item {
-            background-color: var(--card-bg);
-            /* Arkadaki rengi yumuşatma efekti */
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            transition: transform 0.2s ease;
-        }
-
-        .se-item:hover {
-            transform: translateY(-2px);
-        }
-
-        .se-u {
-            font-weight: 700;
-            font-size: 0.95rem;
-            color: var(--primary-color);
-            margin-bottom: 4px;
-            display: block;
-        }
-
-        .se-t {
-            font-size: 0.9rem;
-            color: var(--text-color);
-            word-wrap: break-word;
-        }
-
-        .se-admin-reply {
-            margin-top: 12px;
-            padding: 10px;
-            background-color: rgba(0, 0, 0, 0.05);
-            border-left: 3px solid var(--primary-color);
-            border-radius: 6px;
-            font-size: 0.85rem;
-        }
-
-        /* Form Alanı */
-        .se-form-container {
-            border-top: 1px solid var(--border-color);
-            padding-top: 20px;
-        }
-
-        input[type="text"],
-        textarea {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            box-sizing: border-box;
-            background-color: var(--input-bg);
-            color: var(--text-color);
-            font-size: 0.9rem;
+        .form-input:focus {
+            border-color: #3b82f6;
             outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
 
-        input[type="text"]:focus,
-        textarea:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(49, 130, 206, 0.2);
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--primary-color);
+        .btn-classic {
+            background-color: #374151;
             color: white;
-            border: none;
-            border-radius: 8px;
+            padding: 0.6rem 1.5rem;
+            border-radius: 0.375rem;
             font-weight: 600;
-            cursor: pointer;
-            transition: opacity 0.2s;
+            font-size: 0.875rem;
         }
-
-        button:hover {
-            opacity: 0.9;
+        .btn-reply {
+            color: #64748b;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            border: 1px solid #e2e8f0;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.25rem;
+            margin-top: 0.5rem;
         }
-
-        button:disabled {
-            filter: grayscale(1);
-            cursor: not-allowed;
-        }
-
-        .se-empty-message {
-            text-align: center;
-            color: var(--sub-text-color);
-            font-size: 0.9rem;
-            padding: 20px;
-        }
+        .dark .btn-reply { color: #94a3b8; border-color: #334155; }
     </style>
 </head>
-<body>
+<body class="p-4 text-slate-800 dark:text-slate-200">
 
-    <div id="se-list">
-        <p class="se-empty-message">Yorumlar yükleniyor...</p>
-    </div>
+    <div class="max-w-3xl mx-auto space-y-8">
+        
+        <div class="space-y-4">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-500">Bir Yorum Bırakın</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-1">
+                    <label class="text-xs font-semibold">Nickname</label>
+                    <input type="text" id="se-u" class="form-input w-full p-2 rounded" placeholder="İsminiz">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-xs font-semibold">Email (isteğe bağlı)</label>
+                    <input type="email" class="form-input w-full p-2 rounded" placeholder="E-posta">
+                </div>
+            </div>
+            <div class="space-y-1">
+                <label class="text-xs font-semibold">Comment</label>
+                <textarea id="se-t" rows="4" class="form-input w-full p-3 rounded resize-y" placeholder="Mesajınız..."></textarea>
+            </div>
+            <button id="se-btn" class="btn-classic">Yorum Gönder</button>
+        </div>
 
-    <div class="se-form-container">
-        <input type="text" id="se-u" placeholder="Adınız">
-        <textarea id="se-t" rows="3" placeholder="Yorumunuzu buraya yazın..."></textarea>
-        <button id="se-btn">Yorumu Gönder</button>
+        <hr class="border-slate-200 dark:border-slate-800">
+
+        <div id="se-list" class="space-y-8 pb-20">
+            <p class="text-slate-400 text-sm italic">Yorumlar yükleniyor...</p>
+        </div>
+
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, push, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // Firebase Ayarları
         const config = {
             apiKey: "AIzaSyAGw79xzO43dw5Vts7f2iV6vmA_BLxBJ1A",
             authDomain: "secoment.firebaseapp.com",
             databaseURL: "https://secoment-default-rtdb.firebaseio.com",
-            projectId: "secoment",
-            appId: "1:1028497467881:web:b6af0d2301ec5323120378"
+            projectId: "secoment"
         };
 
         const app = initializeApp(config);
         const db = getDatabase(app);
-
         const params = new URLSearchParams(window.location.search);
         const pageId = params.get('id') || "global";
         const dbRef = ref(db, 'comments/' + pageId);
 
-        // Listeleme
-        onValue(dbRef, (snapshot) => {
-            const listElement = document.getElementById("se-list");
-            let htmlContent = "";
+        // Listeleme Mantığı
+        onValue(dbRef, (snap) => {
+            const list = document.getElementById("se-list");
+            let html = "";
             let count = 0;
 
-            if (snapshot.exists()) {
-                const data = snapshot.val();
-                const keys = Object.keys(data).reverse(); // En yeni en üstte
+            if (snap.exists()) {
+                const data = snap.val();
+                // En yeni yorumu en üstte göster
+                const keys = Object.keys(data).reverse();
 
                 keys.forEach(key => {
-                    const comment = data[key];
-                    if (comment.approved) {
+                    const v = data[key];
+                    if (v.approved) {
                         count++;
-                        let reply = comment.reply ? `<div class="se-admin-reply"><b>Yanıt:</b> ${comment.reply}</div>` : '';
-                        htmlContent += `
-                            <div class="se-item">
-                                <span class="se-u">${comment.u}</span>
-                                <div class="se-t">${comment.t}</div>
-                                ${reply}
-                            </div>`;
+                        html += `
+                        <div class="comment-item space-y-2">
+                            <div class="flex flex-col">
+                                <span class="font-bold text-slate-900 dark:text-white text-[15px]">${v.u || 'Anonim'}</span>
+                                <span class="text-[10px] text-slate-500 uppercase">${new Date(v.time).toLocaleString('tr-TR')}</span>
+                            </div>
+                            <p class="text-[15px] leading-relaxed opacity-90">${v.t}</p>
+                            
+                            ${v.reply ? `
+                                <div class="reply-thread mt-4 space-y-1">
+                                    <span class="font-bold text-blue-600 dark:text-blue-400 text-[11px] uppercase tracking-widest">Yanıt</span>
+                                    <p class="text-sm italic opacity-80">${v.reply}</p>
+                                    <button class="btn-reply">Reply</button>
+                                </div>
+                            ` : '<button class="btn-reply">Reply</button>'}
+                        </div>`;
                     }
                 });
             }
 
-            listElement.innerHTML = count === 0 ? 
-                `<p class="se-empty-message">Henüz yorum yok. İlk yorumu siz yapın!</p>` : htmlContent;
+            if (count === 0) {
+                list.innerHTML = '<p class="text-slate-400 text-sm italic">Henüz yorum yapılmamış. İlk yorumu siz yapın!</p>';
+            } else {
+                list.innerHTML = html;
+            }
         });
 
-        // Gönderme
+        // Gönderme Mantığı
         document.getElementById("se-btn").onclick = async () => {
             const u = document.getElementById("se-u").value.trim();
             const t = document.getElementById("se-t").value.trim();
             const btn = document.getElementById("se-btn");
 
-            if (!u || !t) return alert("Eksik bilgi!");
+            if (!t) return alert("Yorum alanı boş bırakılamaz.");
 
             btn.disabled = true;
             btn.innerText = "Gönderiliyor...";
 
             try {
-                await push(dbRef, { u, t, approved: false, time: serverTimestamp() });
-                alert("Yorumunuz onaya gönderildi.");
+                await push(dbRef, { 
+                    u: u || 'Anonim', 
+                    t: t, 
+                    approved: false, 
+                    time: serverTimestamp() 
+                });
+                alert("Yorumunuz başarıyla iletildi, onaylandıktan sonra görünecektir.");
                 document.getElementById("se-t").value = "";
             } catch (e) {
-                alert("Hata oluştu.");
+                alert("Bir hata oluştu.");
             } finally {
                 btn.disabled = false;
-                btn.innerText = "Yorumu Gönder";
+                btn.innerText = "Yorum Gönder";
             }
         };
 
-        // Yükseklik Bildirimi (Iframe için)
-        const updateHeight = () => {
-            if (window.parent) {
-                window.parent.postMessage({ frameHeight: document.body.scrollHeight }, '*');
-            }
-        };
-        new ResizeObserver(updateHeight).observe(document.body);
-        window.onload = updateHeight;
+        // Dark Mode Desteği (Slate/Deep Blue)
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+            document.body.style.backgroundColor = "#0f172a";
+        }
     </script>
 </body>
 </html>
