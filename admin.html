@@ -1,94 +1,209 @@
-<div id="adm-app" style="max-width: 600px; margin: 0 auto; padding: 15px; font-family: sans-serif;">
-    <div id="login-box" style="text-align:center; padding: 50px 0;">
-        <h2>Admin Girişi</h2>
-        <input type="email" id="email" placeholder="E-posta" style="width:100%; padding:12px; margin-bottom:10px;">
-        <input type="password" id="pass" placeholder="Şifre" style="width:100%; padding:12px; margin-bottom:20px;">
-        <button onclick="login()" style="width:100%; padding:12px; background:#111; color:#fff; border:none; border-radius:8px;">Giriş Yap</button>
-    </div>
+<!DOCTYPE html>
+<html lang="tr" class="antialiased">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SekoMent Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Kaydırma çubuğunu gizle ama işlevini koru */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Aktif link stili */
+        .nav-active { color: #3b82f6 !important; }
+        .nav-active svg { transform: scale(1.1); color: #3b82f6; }
 
-    <div id="dash" style="display:none;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h3>Yorum Yönetimi</h3>
-            <button onclick="logout()" style="background:none; border:none; color:red; cursor:pointer;">Çıkış</button>
+        /* Mobil dokunma alanı iyileştirmesi */
+        button, a { touch-action: manipulation; }
+
+        /* Safe area for notched phones */
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+    </style>
+</head>
+<body class="bg-[#f8fafc] dark:bg-[#050505] text-slate-900 dark:text-slate-100 min-h-screen">
+
+    <div id="login-box" class="flex items-center justify-center min-h-screen px-4">
+        <div class="w-full max-w-md bg-white dark:bg-[#0f0f0f] p-8 rounded-[2.5rem] shadow-xl border border-slate-200 dark:border-white/5">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-blue-600 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                    <span class="text-white text-2xl font-black">S</span>
+                </div>
+                <h2 class="text-2xl font-extrabold tracking-tight">Hoş Geldiniz</h2>
+                <p class="text-slate-500 text-sm mt-1">Lütfen giriş yapın.</p>
+            </div>
+            <div class="space-y-4">
+                <input type="email" id="email" placeholder="E-posta" class="w-full px-5 py-4 rounded-2xl bg-slate-50 dark:bg-black border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                <input type="password" id="pass" placeholder="Şifre" class="w-full px-5 py-4 rounded-2xl bg-slate-50 dark:bg-black border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                <button onclick="login()" class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl transition-all active:scale-[0.98]">Giriş Yap</button>
+            </div>
         </div>
-        <div id="admin-list"></div>
     </div>
-</div>
 
-<style>
-    .adm-card { background:#fff; border:1px solid #ddd; border-radius:12px; padding:15px; margin-bottom:15px; box-shadow:0 2px 4px rgba(0,0,0,0.05); }
-    .adm-u { font-weight:700; color:#2563eb; }
-    .adm-t { margin: 8px 0; font-size:14px; }
-    .adm-actions { display:flex; gap:10px; margin-top:15px; }
-    .btn { padding:8px 12px; border:none; border-radius:6px; cursor:pointer; font-size:12px; font-weight:600; }
-    .btn-ok { background:#22c55e; color:#fff; }
-    .btn-del { background:#ef4444; color:#fff; }
-    .reply-box { margin-top:15px; display:none; }
-    .reply-input { width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; font-size:13px; }
-</style>
+    <div id="dash" class="hidden flex-col md:flex-row">
+        
+        <aside class="hidden md:flex w-72 h-screen sticky top-0 flex-col bg-white dark:bg-[#0a0a0a] border-r border-slate-200 dark:border-white/5 p-8">
+            <div class="text-2xl font-black tracking-tighter mb-12">SekoMent.</div>
+            <nav class="space-y-2 flex-1">
+                <button onclick="showSec('comments-sec', this)" class="nav-btn nav-active w-full flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-all text-slate-500 font-bold uppercase text-xs tracking-widest">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+                    Yorumlar
+                </button>
+                <button onclick="showSec('settings-sec', this)" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-all text-slate-500 font-bold uppercase text-xs tracking-widest">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    Ayarlar
+                </button>
+            </nav>
+            <div class="pt-8 border-t border-slate-200 dark:border-white/5 flex gap-4">
+                <button onclick="setTheme('light')" class="flex-1 p-2 bg-slate-50 dark:bg-white/5 rounded-lg text-sm">☀️</button>
+                <button onclick="setTheme('dark')" class="flex-1 p-2 bg-slate-50 dark:bg-white/5 rounded-lg text-sm">🌙</button>
+                <button onclick="logout()" class="flex-1 p-2 bg-red-50 text-red-500 rounded-lg text-sm font-bold">BYE</button>
+            </div>
+        </aside>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        <main class="flex-1 p-4 md:p-12 max-w-5xl mx-auto w-full pb-32 md:pb-12">
+            
+            <header class="flex justify-between items-center mb-8">
+                <h1 class="text-3xl font-black tracking-tighter">Panel.</h1>
+                <button onclick="toggleThemeMobile()" class="md:hidden p-3 bg-white dark:bg-white/5 rounded-2xl shadow-sm border border-slate-200 dark:border-white/10 text-xl">🌗</button>
+            </header>
 
-    const config = {
-        apiKey: "AIzaSyAGw79xzO43dw5Vts7f2iV6vmA_BLxBJ1A",
-        authDomain: "secoment.firebaseapp.com",
-        databaseURL: "https://secoment-default-rtdb.firebaseio.com",
-        projectId: "secoment"
-    };
+            <section id="comments-sec" class="page-section space-y-4">
+                <div id="admin-list" class="grid gap-4">
+                    <p class="text-slate-400 text-center py-20 italic">Yorumlar yükleniyor...</p>
+                </div>
+            </section>
 
-    const app = initializeApp(config);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
+            <section id="settings-sec" class="page-section hidden space-y-6">
+                <div class="bg-white dark:bg-[#0f0f0f] p-6 rounded-[2rem] border border-slate-200 dark:border-white/5 shadow-sm">
+                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2">🔑 Şifre Güncelle</h3>
+                    <input type="password" id="new-pass" placeholder="Yeni şifreniz" class="w-full p-4 mb-4 rounded-xl bg-slate-50 dark:bg-black border border-slate-200 dark:border-white/10 outline-none">
+                    <button onclick="changePass()" class="w-full py-4 bg-slate-900 dark:bg-white dark:text-black text-white rounded-xl font-bold">Şifreyi Kaydet</button>
+                </div>
 
-    window.login = () => signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('pass').value);
-    window.logout = () => signOut(auth);
+                <div class="bg-white dark:bg-[#0f0f0f] p-6 rounded-[2rem] border border-slate-200 dark:border-white/5 shadow-sm">
+                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2">🚪 Oturum</h3>
+                    <button onclick="logout()" class="w-full py-4 bg-red-50 text-red-500 rounded-xl font-bold">Çıkış Yap</button>
+                </div>
+            </section>
 
-    onAuthStateChanged(auth, (user) => {
-        document.getElementById('login-box').style.display = user ? 'none' : 'block';
-        document.getElementById('dash').style.display = user ? 'block' : 'none';
-        if(user) loadComments();
-    });
+        </main>
 
-    function loadComments() {
-        onValue(ref(db, 'comments'), (snap) => {
-            const list = document.getElementById("admin-list");
-            list.innerHTML = "";
-            snap.forEach((pageSnap) => {
-                const pId = pageSnap.key;
-                pageSnap.forEach((cSnap) => {
-                    const v = cSnap.val();
-                    const cId = cSnap.key;
-                    list.innerHTML += `
-                        <div class="adm-card">
-                            <div class="adm-u">${v.u} <small style="color:#999">(${pId})</small></div>
-                            <div class="adm-t">${v.t}</div>
-                            <div class="adm-actions">
-                                ${!v.approved ? `<button class="btn btn-ok" onclick="approve('${pId}','${cId}')">Onayla</button>` : `<span style="color:green; font-size:12px;">✅ Onaylı</span>`}
-                                <button class="btn" style="background:#eee" onclick="showReply('${cId}')">Yanıtla</button>
-                                <button class="btn btn-del" onclick="del('${pId}','${cId}')">Sil</button>
-                            </div>
-                            <div id="rb-${cId}" class="reply-box">
-                                <input type="text" id="ri-${cId}" class="reply-input" placeholder="Yanıtınız..." value="${v.reply || ''}">
-                                <button class="btn btn-ok" style="margin-top:5px; width:100%" onclick="saveReply('${pId}','${cId}')">Yanıtı Kaydet</button>
-                            </div>
-                        </div>`;
+        <nav class="md:hidden fixed bottom-6 left-6 right-6 h-16 bg-white/80 dark:bg-black/80 backdrop-blur-2xl border border-slate-200 dark:border-white/10 rounded-[2rem] shadow-2xl flex items-center justify-around z-50 pb-safe">
+            <button onclick="showSec('comments-sec', this)" class="nav-btn nav-active flex flex-col items-center justify-center w-full h-full text-slate-400 transition-all">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+                <span class="text-[9px] font-bold mt-1 uppercase tracking-tighter">Mesajlar</span>
+            </button>
+            <button onclick="showSec('settings-sec', this)" class="nav-btn flex flex-col items-center justify-center w-full h-full text-slate-400 transition-all">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+                <span class="text-[9px] font-bold mt-1 uppercase tracking-tighter">Ayarlar</span>
+            </button>
+        </nav>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, updatePassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const config = {
+            apiKey: "AIzaSyAGw79xzO43dw5Vts7f2iV6vmA_BLxBJ1A",
+            authDomain: "secoment.firebaseapp.com",
+            databaseURL: "https://secoment-default-rtdb.firebaseio.com",
+            projectId: "secoment"
+        };
+        const app = initializeApp(config);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        // UI & Themes
+        window.setTheme = (t) => {
+            if (t === 'system') {
+                const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.documentElement.classList.toggle('dark', isDark);
+            } else {
+                document.documentElement.classList.toggle('dark', t === 'dark');
+                localStorage.theme = t;
+            }
+        };
+        window.toggleThemeMobile = () => setTheme(document.documentElement.classList.contains('dark') ? 'light' : 'dark');
+        if (localStorage.theme === 'dark' || (!localStorage.theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');
+
+        // Auth
+        window.login = () => signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('pass').value).catch(() => alert("Hata!"));
+        window.logout = () => signOut(auth);
+        onAuthStateChanged(auth, u => {
+            document.getElementById('login-box').classList.toggle('hidden', !!u);
+            document.getElementById('dash').classList.toggle('hidden', !u);
+            document.getElementById('dash').classList.toggle('flex', !!u);
+            if(u) loadComments();
+        });
+
+        window.showSec = (id, btn) => {
+            document.querySelectorAll('.page-section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
+            btn.classList.add('nav-active');
+        };
+
+        function loadComments() {
+            onValue(ref(db, 'comments'), snap => {
+                const list = document.getElementById("admin-list");
+                list.innerHTML = "";
+                if(!snap.exists()) { list.innerHTML = "<div class='text-center py-20 opacity-50'>Henüz mesaj yok.</div>"; return; }
+                
+                snap.forEach(page => {
+                    page.forEach(cSnap => {
+                        const v = cSnap.val();
+                        const pId = page.key;
+                        const cId = cSnap.key;
+                        list.innerHTML += `
+                            <div class="bg-white dark:bg-[#0f0f0f] p-6 rounded-[2rem] border border-slate-200 dark:border-white/5 transition-all active:scale-[0.99]">
+                                <div class="flex justify-between items-center mb-4">
+                                    <div class="flex flex-col leading-none">
+                                        <span class="font-extrabold text-blue-600 dark:text-blue-400">@${v.u}</span>
+                                        <span class="text-[9px] font-bold text-slate-400 uppercase mt-1 tracking-tighter">${pId}</span>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button onclick="del('${pId}','${cId}')" class="p-2 bg-red-50 dark:bg-red-900/10 text-red-500 rounded-full">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-6 font-medium">${v.t}</p>
+                                <div class="flex gap-2">
+                                    ${!v.approved ? 
+                                        `<button onclick="approve('${pId}','${cId}')" class="flex-1 py-3 bg-blue-600 text-white rounded-xl text-xs font-black shadow-lg shadow-blue-500/20">ONAYLA</button>` : 
+                                        `<span class="flex-1 py-3 bg-slate-50 dark:bg-white/5 text-slate-400 rounded-xl text-[10px] font-bold text-center tracking-widest">YAYINDA</span>`
+                                    }
+                                    <button onclick="toggleReply('${cId}')" class="flex-1 py-3 border border-slate-200 dark:border-white/10 rounded-xl text-xs font-black">YANITLA</button>
+                                </div>
+                                <div id="rb-${cId}" class="hidden mt-6 space-y-3">
+                                    <textarea id="ri-${cId}" class="w-full p-4 rounded-2xl bg-slate-50 dark:bg-black border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-blue-500 text-sm" rows="3" placeholder="Yanıtınız...">${v.reply || ''}</textarea>
+                                    <button onclick="saveReply('${pId}','${cId}')" class="w-full py-4 bg-black dark:bg-white dark:text-black text-white rounded-2xl font-black text-xs">YAYINLA</button>
+                                </div>
+                            </div>`;
+                    });
                 });
             });
-        });
-    }
+        }
 
-    window.approve = (p, c) => update(ref(db, `comments/${p}/${c}`), { approved: true });
-    window.del = (p, c) => confirm("Silinsin mi?") && remove(ref(db, `comments/${p}/${c}`));
-    window.showReply = (cId) => {
-        const box = document.getElementById(`rb-${cId}`);
-        box.style.display = box.style.display === 'block' ? 'none' : 'block';
-    };
-    window.saveReply = (p, c) => {
-        const txt = document.getElementById(`ri-${c}`).value;
-        update(ref(db, `comments/${p}/${c}`), { reply: txt, approved: true });
-        alert("Yanıt kaydedildi ve yorum onaylandı.");
-    };
-</script>
+        window.approve = (p, c) => update(ref(db, `comments/${p}/${c}`), { approved: true });
+        window.del = (p, c) => confirm("Kalıcı olarak silinecek?") && remove(ref(db, `comments/${p}/${c}`));
+        window.toggleReply = (id) => document.getElementById(`rb-${id}`).classList.toggle('hidden');
+        window.saveReply = (p, c) => update(ref(db, `comments/${p}/${c}`), { reply: document.getElementById(`ri-${c}`).value, approved: true });
+        window.changePass = () => updatePassword(auth.currentUser, document.getElementById('new-pass').value).then(() => alert("Şifre güncellendi!"));
+    </script>
+</body>
+</html>
